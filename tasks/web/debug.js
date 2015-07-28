@@ -20,7 +20,7 @@ var paths = (function() {
         srcLess: srcRoot + '/**/*.less',
         srcTs: srcRoot + '/**/*.ts',
 
-        buildDebug: buildRoot,
+        build: buildRoot,
         builtIndex: builtIndex,
         builtHtml: [buildRoot + '/**/*.html', '!' + builtIndex],
         builtCss: buildRoot + '/**/*.css',
@@ -29,15 +29,14 @@ var paths = (function() {
 })();
 
 
-
-// -------------------- serve --------------------
+// -------------------- build --------------------
 var batch = require('gulp-batch');
 var runSequence = require('run-sequence').use(gulp);
 var watch = require('gulp-watch');
 
-gulp.task('web:clean', function (callback) {
+gulp.task('web:clean', function (done) {
     cache.caches = {};
-    del([paths.buildDebug], callback);
+    del([paths.build], done);
 });
 
 gulp.task('web:build', ['web:clean'], function(done) {
@@ -72,12 +71,7 @@ gulp.task('web:serve', ['web:build'], function() {
 // -------------------- markup --------------------
 var jade = require('gulp-jade');
 
-gulp.task('web:clean:templates', function (callback) {
-    delete cache.caches['templates'];
-    del([paths.builtHtml], callback);
-});
-
-function compileTemplates() {
+gulp.task('web:compile:templates', function () {
     return gulp
         .src(paths.srcJade)
         .pipe(cache('templates', { optimizeMemory: true }))
@@ -85,11 +79,9 @@ function compileTemplates() {
         .pipe(sourcemaps.init())
         .pipe(jade())
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(paths.buildDebug))
+        .pipe(gulp.dest(paths.build))
         .pipe(livereload());
-};
-
-gulp.task('web:compile:templates', compileTemplates);
+});
 
 
 // -------------------- styles --------------------
@@ -97,12 +89,7 @@ var autoprefixer = require('autoprefixer-core');
 var less = require('gulp-less');
 var postCss = require('gulp-postcss');
 
-gulp.task('web:clean:styles', function (callback) {
-    delete cache.caches['styles'];
-    del([paths.builtCss], callback);
-});
-
-function compileStyles() {
+gulp.task('web:compile:styles', function () {
     return gulp
         .src(paths.srcLess)
         .pipe(cache('styles', { optimizeMemory: true }))
@@ -111,11 +98,9 @@ function compileStyles() {
         .pipe(less())
         .pipe(postCss([ autoprefixer({ browsers: ['> 2%'] }) ]))
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(paths.buildDebug))
+        .pipe(gulp.dest(paths.build))
         .pipe(livereload());
-}
-
-gulp.task('web:compile:styles', compileStyles);
+});
 
 
 // -------------------- scripts -------------------
@@ -129,11 +114,7 @@ var tsProject = ts.createProject({
     sortOutput: true
 });
 
-gulp.task('web:clean:scripts', function (callback) {
-    del([paths.builtJs], callback);
-});
-
-function compileScripts() {
+gulp.task('web:compile:scripts', function () {
     return gulp
         .src(paths.srcTs)
         .pipe(plumber())
@@ -141,11 +122,9 @@ function compileScripts() {
         .pipe(ts(tsProject))
         .js
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(paths.buildDebug))
+        .pipe(gulp.dest(paths.build))
         .pipe(livereload());
-}
-
-gulp.task('web:compile:scripts', compileScripts);
+});
 
 
 // -------------------- inject --------------------
@@ -153,11 +132,7 @@ var inject = require('gulp-inject');
 var angularFilesort = require('gulp-angular-filesort');
 var bowerFiles = require('main-bower-files');
 
-gulp.task('web:clean:index', function (callback) {
-    del([paths.builtIndex], callback);
-});
-
-function compileIndex() {
+gulp.task('web:compile:index', function () {
     var styles = gulp.src(paths.builtCss, { read: false });
     var scripts = gulp.src(paths.builtJs).pipe(angularFilesort());
 
@@ -169,8 +144,6 @@ function compileIndex() {
         .pipe(inject(es.merge(styles, scripts)))
         .pipe(jade())
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(paths.buildDebug))
+        .pipe(gulp.dest(paths.build))
         .pipe(livereload());
-}
-
-gulp.task('web:compile:index', compileIndex);
+});
