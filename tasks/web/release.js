@@ -60,34 +60,13 @@ gulp.task('web:build:release', ['web:build:release:jade', 'web:build:release:les
 
 // -------------------- markup --------------------
 var jade = require('gulp-jade');
-
-gulp.task('web:build:debug:jade', function() {
-    return gulp.src(paths.srcJade)
-        .pipe(sourcemaps.init())
-        .pipe(jade())
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(paths.compiledRoot));
-});
+var angularTemplatecache = require('gulp-angular-templatecache');
 
 gulp.task('web:build:release:jade', function() {
     return gulp.src(paths.srcJade)
         .pipe(sourcemaps.init())
         .pipe(jade())
-        .pipe(tap(function(file) {
-            file.contents = Buffer.concat([
-                "t.put('" + file.path + "', '",
-                file.contents.replace(/[\n\r]/g, "").replace("'", "\'"),
-                "');"
-            ]);
-        }))
-        .pipe(concat('templates.js'))
-        .pipe(tap(function(file) {
-            file.contents = Buffer.concat([
-                "angular.module('" + angularApp + "').run(['$templateCache',function(t){",
-                file.contents,
-                "}]);"
-            ]);
-        }))
+        .pipe(angularTemplatecache('templates.js'))
         .pipe(rev())
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(paths.compiledRoot));
