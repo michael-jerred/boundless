@@ -26,7 +26,7 @@ var paths = (function() {
 
         build: buildRoot,
         builtIndex: builtIndex,
-        builtHtml: buildRoot + '/templates.js',
+        builtTemplates: buildRoot + '/templates.js',
         builtCss: buildRoot + '/styles.css',
         builtJs: buildRoot + '/scripts.js',
         builtLibraryCss: buildRoot + '/libraries.css',
@@ -57,7 +57,7 @@ gulp.task('web:compile:templates', function () {
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(jade())
-        .pipe(angularTemplateCache('templates.js', { standalone: true }))
+        .pipe(angularTemplateCache(paths.builtTemplates, { standalone: true }))
         .pipe(rev())
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(paths.build));
@@ -77,7 +77,7 @@ gulp.task('web:compile:styles', function () {
         .pipe(sourcemaps.init())
         .pipe(less())
         .pipe(postCss([ autoprefixer({ browsers: ['> 2%'] }) ]))
-        .pipe(concat('styles.css'))
+        .pipe(concat(paths.builtCss))
         .pipe(cssmin())
         .pipe(rev())
         .pipe(sourcemaps.write('.'))
@@ -104,7 +104,7 @@ gulp.task('web:compile:scripts', function () {
         .pipe(sourcemaps.init())
         .pipe(ts(tsProject))
         .js
-        .pipe(concat('scripts.js'))
+        .pipe(concat(paths.builtJs))
         .pipe(uglify())
         .pipe(rev())
         .pipe(sourcemaps.write('.'))
@@ -113,6 +113,8 @@ gulp.task('web:compile:scripts', function () {
 
 
 // -------------------- bower --------------------
+var bowerFiles = require('main-bower-files');
+
 gulp.task('web:compile:libraries', function () {
     var filterCss = filter('**/*.css', { restore: true });
     var filterJs = filter('**/*.js', { restore: true });
@@ -135,19 +137,15 @@ gulp.task('web:compile:libraries', function () {
 
 // -------------------- inject --------------------
 var inject = require('gulp-inject');
-var angularFilesort = require('gulp-angular-filesort');
-var bowerFiles = require('main-bower-files');
 
 gulp.task('web:compile:index', function () {
-    var styles = gulp.src(paths.builtCss, { read: false });
-    var scripts = gulp.src(paths.builtJs).pipe(angularFilesort());
-
     return gulp
         .src(paths.srcIndex)
         .pipe(sourcemaps.init())
-        .pipe(inject(gulp.src(bowerFiles(), { read: false }), { name: 'bower' }))
+        .pipe(inject(gulp.src([paths.builtLibraryCss, paths.builtLibraryJs], { read: false }), { name: 'bower' }))
+        .pipe(inject(gulp.src([paths.builtTemplates], { read: false }), { name: 'templates' }))
         //.pipe(inject(, { name: 'head' }))
-        .pipe(inject(es.merge(styles, scripts)))
+        .pipe(inject(gulp.src([paths.builtCss, paths.builtJs], { read: false })))
         .pipe(jade())
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(paths.build));
