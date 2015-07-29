@@ -1,2 +1,2 @@
-require('/tasks/gulp-cordova.js');
-require('/tasks/gulp-web.js');
+//require('/tasks/gulp-cordova.js');
+require('./tasks/web/debug.js');

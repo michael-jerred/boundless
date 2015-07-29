@@ -1,8 +1,8 @@
 var gulp = require('gulp');
 var cache = require('gulp-cached');
+var connect = require('gulp-connect');
 var del = require('del');
 var es = require('event-stream');
-var livereload = require('gulp-livereload');
 var plumber = require('gulp-plumber');
 var sourcemaps = require('gulp-sourcemaps');
 
@@ -20,7 +20,7 @@ var paths = (function() {
         srcLess: srcRoot + '/**/*.less',
         srcTs: srcRoot + '/**/*.ts',
 
-        build: buildRoot,
+        built: buildRoot,
         builtIndex: builtIndex,
         builtHtml: [buildRoot + '/**/*.html', '!' + builtIndex],
         builtCss: buildRoot + '/**/*.css',
@@ -36,7 +36,7 @@ var watch = require('gulp-watch');
 
 gulp.task('web:clean', function (done) {
     cache.caches = {};
-    del([paths.build], done);
+    del([paths.built], done);
 });
 
 gulp.task('web:build', ['web:clean'], function(done) {
@@ -44,23 +44,30 @@ gulp.task('web:build', ['web:clean'], function(done) {
 });
 
 gulp.task('web:serve', ['web:build'], function() {
-    livereload.listen();
+    connect.server({
+        root: paths.built,
+        livereload: true
+    });
 
-    watch([paths.srcJade], batch(function (events, done) {
+    watch(paths.srcJade, { verbose: true }, batch(function (events, done) {
         runSequence('web:compile:templates', done);
     }));
 
-    watch([paths.srcLess], batch(function (events, done) {
+    watch(paths.srcLess, { verbose: true }, batch(function (events, done) {
         runSequence('web:compile:styles', done);
     }));
 
-    watch([paths.srcTs], batch(function (events, done) {
+    watch(paths.srcTs, { verbose: true }, batch(function (events, done) {
         runSequence('web:compile:scripts', done);
     }));
 
+    watch(paths.srcIndex, { verbose: true }, batch(function(events, done) {
+        runSequence('web:compile:index', done);
+    }));
+
     watch(
-        [paths.srcIndex, paths.builtCss, paths.builtJs],
-        { events: ['add', 'unlink'] },
+        [paths.builtCss, paths.builtJs],
+        { verbose: true, events: ['add', 'unlink'] },
         batch(function (events, done) {
             runSequence('web:compile:index', done);
         })
@@ -79,8 +86,8 @@ gulp.task('web:compile:templates', function () {
         .pipe(sourcemaps.init())
         .pipe(jade())
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(paths.build))
-        .pipe(livereload());
+        .pipe(gulp.dest(paths.built))
+        .pipe(connect.reload());
 });
 
 
@@ -98,8 +105,8 @@ gulp.task('web:compile:styles', function () {
         .pipe(less())
         .pipe(postCss([ autoprefixer({ browsers: ['> 2%'] }) ]))
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(paths.build))
-        .pipe(livereload());
+        .pipe(gulp.dest(paths.built))
+        .pipe(connect.reload());
 });
 
 
@@ -122,8 +129,8 @@ gulp.task('web:compile:scripts', function () {
         .pipe(ts(tsProject))
         .js
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(paths.build))
-        .pipe(livereload());
+        .pipe(gulp.dest(paths.built))
+        .pipe(connect.reload());
 });
 
 
@@ -144,6 +151,6 @@ gulp.task('web:compile:index', function () {
         .pipe(inject(es.merge(styles, scripts)))
         .pipe(jade())
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(paths.build))
-        .pipe(livereload());
+        .pipe(gulp.dest(paths.built))
+        .pipe(connect.reload());
 });
