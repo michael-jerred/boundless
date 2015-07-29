@@ -13,6 +13,7 @@ var paths = (function() {
     var srcIndex = srcRoot + '/index.jade';
     var builtIndex = buildRoot + '/index.hmtl';
     return {
+        tsConfig: './tsconfig.json',
         tsTypings: './typings/**/*.d.ts',
 
         srcIndex: srcIndex,
@@ -31,6 +32,7 @@ var paths = (function() {
 
 // -------------------- build --------------------
 var batch = require('gulp-batch');
+var opn = require('opn');
 var runSequence = require('run-sequence').use(gulp);
 var watch = require('gulp-watch');
 
@@ -48,6 +50,8 @@ gulp.task('web:serve', ['web:build'], function() {
         root: paths.built,
         livereload: true
     });
+
+    opn('http://localhost:8080');
 
     watch(paths.srcJade, { verbose: true }, batch(function (events, done) {
         runSequence('web:compile:templates', done);
@@ -113,17 +117,11 @@ gulp.task('web:compile:styles', function () {
 // -------------------- scripts -------------------
 var ts = require('gulp-typescript');
 
-var tsProject = ts.createProject({
-    declarationFiles: false,
-    noExternalResolve: true,
-    noImplicitAny: true,
-    target: 'ES5',
-    sortOutput: true
-});
+var tsProject = ts.createProject(paths.tsConfig);
 
 gulp.task('web:compile:scripts', function () {
     return gulp
-        .src(paths.srcTs)
+        .src([paths.tsTypings, paths.srcTs])
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(ts(tsProject))

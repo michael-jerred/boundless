@@ -2,7 +2,6 @@
 # http://git-scm.com/docs/gitignore
 
 bower_components/
+build/
 node_modules/
 typings/
-.build/
-build/
