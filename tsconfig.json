@@ -5,5 +5,9 @@
         "noImplicitAny": true,
         "noResolve": true,
         "removeComments": false
-    }
+    },
+    "files": [
+        "/src",
+        "/typings"
+    ]
 }

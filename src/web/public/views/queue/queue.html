@@ -1,0 +1,8 @@
+<article class="queue">
+    <ul ui-sortable ng-model="queueCtrl.items">
+        <li ng-repeat="item in queueCtrl.items">
+            <video-thumbnail youtube-id="item.youtubeId"></video-thumbnail>
+            {{item.title}}
+        </li>
+    </ul>
+</article>

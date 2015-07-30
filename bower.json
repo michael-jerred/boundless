@@ -3,7 +3,8 @@
     "private": true,
     "dependencies": {
         "angular": "^1.4.3",
-        "angular-bootstrap": "^0.13.1",
+        "angular-material": "^0.10.0",
+        "angular-ui-router": "^0.2.15",
         "lodash": "^3.10.0"
     },
     "devDependencies": {

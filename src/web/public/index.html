@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Boundless</title>
+
+        <!-- bower:css -->
+        <!-- endinject -->
+
+        <!-- inject:css -->
+        <!-- endinject -->
+
+        <!-- head:js -->
+        <!-- endinject -->
+    </head>
+    <body>
+        <section class="col-xs-12">
+            <ui-view name="header"></ui-view>
+        </section>
+        <section class="col-xs-6">
+            <ui-view name="left"></ui-view>
+        </section>
+        <section class="col-xs-6">
+            <ui-view name="right"></ui-view>
+        </section>
+        <section class="col-xs-12">
+            <ui-view name="now-playing"></ui-view>
+        </section>
+
+        <!-- bower:js -->
+        <!-- endinject -->
+
+        <!-- inject:js -->
+        <!-- endinject -->
+
+        <!-- templates:js -->
+        <!-- endinject -->
+    </body>
+</html>

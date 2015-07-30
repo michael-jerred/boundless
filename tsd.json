@@ -13,6 +13,18 @@
     },
     "angular-ui-bootstrap/angular-ui-bootstrap.d.ts": {
       "commit": "855569dbc86b619aa3bbfab98f3ff2e6b55b5fcd"
+    },
+    "angular-ui-router/angular-ui-router.d.ts": {
+      "commit": "855569dbc86b619aa3bbfab98f3ff2e6b55b5fcd"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "855569dbc86b619aa3bbfab98f3ff2e6b55b5fcd"
+    },
+    "angular-ui-sortable/angular-ui-sortable.d.ts": {
+      "commit": "855569dbc86b619aa3bbfab98f3ff2e6b55b5fcd"
+    },
+    "angular-material/angular-material.d.ts": {
+      "commit": "855569dbc86b619aa3bbfab98f3ff2e6b55b5fcd"
     }
   }
 }

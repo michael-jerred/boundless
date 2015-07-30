@@ -10,14 +10,14 @@ var paths = (function() {
     var srcRoot = './src/web/public';
     var buildRoot = './build/debug/web/public';
 
-    var srcIndex = srcRoot + '/index.jade';
+    var srcIndex = srcRoot + '/index.html';
     var builtIndex = buildRoot + '/index.hmtl';
     return {
         tsConfig: './tsconfig.json',
         tsTypings: './typings/**/*.d.ts',
 
         srcIndex: srcIndex,
-        srcJade: [srcRoot + '/**/*.jade', '!' + srcIndex],
+        srcHtml: [srcRoot + '/**/*.html', '!' + srcIndex],
         srcLess: srcRoot + '/**/*.less',
         srcTs: srcRoot + '/**/*.ts',
 
@@ -42,7 +42,10 @@ gulp.task('web:clean', function (done) {
 });
 
 gulp.task('web:build', ['web:clean'], function(done) {
-    runSequence(['web:compile:templates', 'web:compile:styles', 'web:compile:scripts'], 'web:compile:index', done);
+    runSequence(
+        ['web:compile:templates', 'web:compile:styles', 'web:compile:scripts'],
+        'web:compile:index',
+        done);
 });
 
 gulp.task('web:serve', ['web:build'], function() {
@@ -53,7 +56,7 @@ gulp.task('web:serve', ['web:build'], function() {
 
     opn('http://localhost:8080');
 
-    watch(paths.srcJade, { verbose: true }, batch(function (events, done) {
+    watch(paths.srcHtml, { verbose: true }, batch(function (events, done) {
         runSequence('web:compile:templates', done);
     }));
 
@@ -80,16 +83,16 @@ gulp.task('web:serve', ['web:build'], function() {
 
 
 // -------------------- markup --------------------
-var jade = require('gulp-jade');
+//var jade = require('gulp-jade');
 
 gulp.task('web:compile:templates', function () {
     return gulp
-        .src(paths.srcJade)
+        .src(paths.srcHtml)
         .pipe(cache('templates', { optimizeMemory: true }))
-        .pipe(plumber())
-        .pipe(sourcemaps.init())
-        .pipe(jade())
-        .pipe(sourcemaps.write('.'))
+        //.pipe(plumber())
+        //.pipe(sourcemaps.init())
+        //.pipe(jade())
+        //.pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(paths.built))
         .pipe(connect.reload());
 });
@@ -143,12 +146,12 @@ gulp.task('web:compile:index', function () {
 
     return gulp
         .src(paths.srcIndex)
-        .pipe(sourcemaps.init())
+        //.pipe(sourcemaps.init())
         .pipe(inject(gulp.src(bowerFiles(), { read: false }), { name: 'bower' }))
         //.pipe(inject(, { name: 'head' }))
         .pipe(inject(es.merge(styles, scripts)))
-        .pipe(jade())
-        .pipe(sourcemaps.write('.'))
+        //.pipe(jade())
+        //.pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(paths.built))
         .pipe(connect.reload());
 });
