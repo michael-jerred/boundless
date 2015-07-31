@@ -8,19 +8,6 @@ module Main.States {
             $urlMatcherFactoryProvider: ng.ui.IUrlMatcherFactory) {
 
             $urlMatcherFactoryProvider.strictMode(false);
-
-            $stateProvider
-                .state('root', {
-                    abstract: true,
-                    views: {
-
-                    }
-                })
-                .state('root.search', { url: '/search', views: { '': '' } })
-                .state('root.playlists', {})
-                .state('root.search', {})
-                .state('root.search', {})
-                .state('root.search', {});
         }
     }
 
